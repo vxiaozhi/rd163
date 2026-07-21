@@ -1,0 +1,156 @@
+# 网站描述
+description = "小智晖的个人博客 - 研发笔记与技术分享 | 要做一个有 swag 的程序员"
+# 网站关键词
+keywords = ["小智晖", "vxiaozhi", "小智晖的博客", "VXiaoZhi Blog", "博客", "个人网站", "互联网", "Web", "后端", "高并发", "高性能", "云原生", "k8s", "golang", "cpp", "llm", "ai"]
+
+# 应用图标配置
+[app]
+  # 当添加到 iOS 主屏幕或者 Android 启动器时的标题
+  title = "小智晖的博客"
+  # 是否隐藏网站图标资源链接
+  noFavicon = false
+  # 更现代的 SVG 网站图标
+  svgFavicon = ""
+  # Safari 图标颜色
+  iconColor = "#5bbad5"
+  # Windows v8-10 磁贴颜色
+  tileColor = "#da532c"
+
+# 搜索配置(使用本地 fuse 搜索,无需外部服务)
+[search]
+  enable = true
+  # 搜索引擎的类型 ("algolia", "fuse", "pagefind")
+  type = "fuse"
+  # 文章内容最长索引长度
+  contentLength = 4000
+  # 搜索框的占位提示语
+  placeholder = "搜索文章…"
+  # 最大结果数目
+  maxResultLength = 10
+  # 结果内容片段长度
+  snippetLength = 50
+  # 搜索结果中高亮部分的 HTML 标签
+  highlightTag = "em"
+  # 是否在搜索索引中使用基于 baseURL 的绝对路径
+  absoluteURL = false
+  [search.fuse]
+    # https://fusejs.io/api/options.html
+    isCaseSensitive = false
+    minMatchCharLength = 2
+    findAllMatches = false
+    location = 0
+    threshold = 0.1
+    distance = 100
+    ignoreLocation = true
+    useExtendedSearch = false
+    ignoreFieldNorm = false
+
+# 主页信息设置
+[home]
+  # RSS 文章数目
+  rss = 10
+  # 主页个人信息
+  [home.profile]
+    enable = true
+    # Gravatar 邮箱
+    gravatarEmail = ""
+    # 主页显示头像的 URL
+    avatarURL = "https://github.com/vxiaozhi.png"
+    # 头像的链接指向的 URL
+    avatarLinkURL = "https://github.com/vxiaozhi"
+    # 主页显示的网站标题 (支持 HTML 格式)
+    title = ""
+    # 主页显示的网站副标题
+    subtitle = "要做一个有 swag 的程序员"
+    # 是否为副标题显示打字机动画
+    typeit = true
+    # 是否显示社交账号
+    social = true
+    # 免责声明 (支持 HTML 格式)
+    disclaimer = ""
+  # 主页文章列表
+  [home.posts]
+    enable = true
+    # 主页每页显示文章数量
+    paginate = 7
+
+# 主页的社交信息设置(来自源博客 _config.yml)
+[social]
+  Angellist = ""
+  Bandcamp = ""
+  Behance = ""
+  Bilibili = ""
+  Bitbucket = ""
+  BuyMeACoffee = ""
+  Codepen = ""
+  Deviantart = ""
+  Devto = ""
+  Douban = ""
+  Dribbble = ""
+  Email = "whutluohui@gmail.com"
+  Facebook = ""
+  Fivehundredpx = ""
+  Flickr = ""
+  Foursquare = ""
+  FreeCodeCamp = ""
+  Gitea = ""
+  GitHub = "vxiaozhi"
+  Gitlab = ""
+  Goodreads = ""
+  Googlescholar = ""
+  Hackernews = ""
+  Instagram = ""
+  Jsfiddle = ""
+  Keybase = ""
+  Kickstarter = ""
+  Ko-Fi = ""
+  Lastfm = ""
+  Liberapay = ""
+  Linkedin = ""
+  Linktree = ""
+  Mastodon = ""
+  Matrix = ""
+  Medium = ""
+  Mix = ""
+  Odnoklassniki = ""
+  ORCID = ""
+  Patreon = ""
+  Paypal = ""
+  Pinterest = ""
+  QQ = ""
+  QQGroup = ""
+  Quora = ""
+  Reddit = ""
+  Researchgate = ""
+  RSS = true
+  Skype = ""
+  Slidershare = ""
+  Snapchat = ""
+  Soundcloud = ""
+  Spotify = ""
+  Stackoverflow = ""
+  Steam = ""
+  Strava = ""
+  Telegram = ""
+  Thingiverse = ""
+  Tumblr = ""
+  Twitch = ""
+  Twitter = "wmxiaozhi"
+  Vine = ""
+  VK = ""
+  Weibo = "wmxiaozhi"
+  Whatsapp = ""
+  Wordpress = ""
+  Xing = ""
+  XMPP = ""
+  Youtubechannel = ""
+  Youtubecustom = ""
+  Youtubelegacy = ""
+  Zhihu = "vxiaozhi"
+  Bluesky = ""
+
+# 赞助设置
+[sponsor]
+  enable = false
+  bio = "如果你觉得这篇文章对你有所帮助,欢迎赞赏~"
+  link = "https://github.com/sponsors/vxiaozhi"

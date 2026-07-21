@@ -1,0 +1,3 @@
+# Permalinks 配置 (https://gohugo.io/content-management/urls/#permalinks)
+# 文章 URL: /posts/<slug>/,简洁且对中文 SEO 友好
+posts = "/posts/:slugorcontentbasename"

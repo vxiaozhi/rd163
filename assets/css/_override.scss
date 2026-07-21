@@ -1,0 +1,39 @@
+// ==============================
+// Override Variables — 字体系统覆盖
+// 现代科技感:Inter(英文/数字) + Noto Sans SC(中文) + JetBrains Mono(等宽)
+// ==============================
+
+// 全局字体族:英文 Inter 优先,中文 Noto Sans SC,系统字体兜底
+$global-font-family:
+  "Inter",
+  "Noto Sans SC",
+  -apple-system,
+  BlinkMacSystemFont,
+  system-ui,
+  "PingFang SC",
+  "Microsoft YaHei UI",
+  "Microsoft YaHei",
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Arial,
+  sans-serif !default;
+
+// 等宽字体族:JetBrains Mono 优先(代码块)
+$code-font-family:
+  "JetBrains Mono",
+  "Source Code Pro",
+  Menlo,
+  Consolas,
+  Monaco,
+  "PingFang SC",
+  "Microsoft YaHei UI",
+  monospace !default;
+
+// 全局字号保持 16px(中文阅读基准)
+$global-font-size: 16px !default;
+// 行高略增(中文正文 1.5 偏紧,1.7 更舒适)
+$global-line-height: 1.7 !default;
+
+// 标题字重
+$single-h-font-weight: 700 !default;

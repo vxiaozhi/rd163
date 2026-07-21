@@ -1,0 +1,41 @@
++++
+title = "Linux cron 定时任务"
+date = "2025-01-12"
+lastmod = "2025-01-12"
+subtitle = "Linux cron 定时任务"
+description = "Linux cron 定时任务"
+author = "小智晖"
+authors = ["小智晖"]
+categories = ["linux"]
+tags = ["crontab"]
+keywords = []
+toc = true
+draft = false
++++
+
+# Linux cron 定时任务
+
+```
+┌──────────── [optional] seconds (0 - 59)
+| ┌────────── minute (0 - 59)
+| | ┌──────── hour (0 - 23)
+| | | ┌────── day of month (1 - 31)
+| | | | ┌──── month (1 - 12) OR jan,feb,mar,apr ...
+| | | | | ┌── day of week (0 - 6, sunday=0) OR sun,mon ...
+| | | | | |
+* * * * * * command
+```
+参考 [crontab-generator](https://it-tools.tech/crontab-generator)
+
+## 常用命令
+
+```
+crontab {file}
+crontab -l
+```
+
+## 常见问题
+
+1. cron 默认使用 sh 而不是 bash，所以不能使用复杂语法。 参考 [Linux crontab 输出重定向不生效问题解决](https://mengalong.github.io/2018/10/31/crontab-redirect/)
+1. cron.txt 文件不能包含 windows 换行，`with CRLF line terminators`. 否则会出现不执行问题。其它问题可参考 [为什么 crontab 不执行](https://www.zybuluo.com/tony-yin/note/1322612)
+   

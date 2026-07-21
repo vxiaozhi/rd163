@@ -1,0 +1,26 @@
+# 站点基础配置
+# baseURL:站点正式域名(Caddy 反代到本机 public/ 静态文件)
+baseURL = "https://rd163.visword.com/"
+# 默认语言 [en, zh-cn, fr, ...]
+defaultContentLanguage = "zh-cn"
+# 网站标题
+title = "小智晖的博客"
+
+# 是否使用 robots.txt
+enableRobotsTXT = true
+# 是否使用 git 提交日志(用于"最近更新"时间)
+enableGitInfo = true
+# 是否使用 emoji 代码
+enableEmoji = true
+
+# 忽略一些构建错误
+ignoreErrors = ["error-remote-getjson"]
+
+# 主题
+theme = "DoIt"
+
+# 时区(中国)
+timeZone = "Asia/Shanghai"
+
+# 渲染单页的超时时间(部分文章含远程资源,放宽以防偶发慢请求)
+timeout = "5m"

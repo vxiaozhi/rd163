@@ -1,0 +1,565 @@
+// ==============================
+// Custom Style — 小智晖博客视觉系统
+// 设计语言:现代科技感 · 靛蓝(#5b6cff)/青(#06b6d4) · 高对比 · 几何 · 克制
+// ==============================
+
+// ---------- 字体加载 ----------
+// 字体通过 layouts/_partials/head/link.html 用 <link> + preconnect 加载(性能最优)
+// 英文 Inter + 等宽 JetBrains Mono + 中文 Noto Sans SC
+//
+// 注:_override.scss 的 SCSS 变量覆盖在 Dart Sass 编译链里不生效
+// (Hugo 的 assets 覆盖机制不作用于 SCSS @import 的 partial),
+// 因此字体族在这里用 CSS 直接覆盖整个 body/代码块的 font-family。
+
+// 全局字体:Inter(英文/数字) + Noto Sans SC(中文) + 系统兜底
+html,
+body,
+.single-title,
+.home-title,
+.home-subtitle,
+.post-meta,
+.header-title,
+.archive-item,
+.tag-cloud-tags,
+.pagination,
+.toc {
+  font-family: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont,
+    system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+// 等宽字体:JetBrains Mono(代码块、TypeIt 打字机副标题)
+code,
+pre,
+.highlight,
+.highlight pre,
+.home-subtitle,
+.typeit {
+  font-family: "JetBrains Mono", "Source Code Pro", Menlo, Consolas, Monaco,
+    "PingFang SC", "Microsoft YaHei UI", monospace !important;
+}
+
+// ---------- 设计 Token ----------
+:root {
+  // 主色:靛蓝 → 青
+  --brand-primary: #5b6cff;
+  --brand-primary-hover: #4452ff;
+  --brand-accent: #06b6d4;
+  --brand-gradient: linear-gradient(135deg, #5b6cff 0%, #06b6d4 100%);
+
+  // 链接色(覆盖 DoIt 默认青蓝)
+  --global-link-color: #5b6cff;
+  --global-link-hover-color: #06b6d4;
+  --single-link-color: #5b6cff;
+  --single-link-hover-color: #06b6d4;
+
+  // 文字层次(更精致的灰阶)
+  --global-font-secondary-color: #525252;
+
+  // 分隔/边框
+  --global-border-color: #e8e8ec;
+
+  // 选中
+  --selection-color: rgba(91, 108, 255, 0.18);
+
+  // Header
+  --header-background-color: rgba(255, 255, 255, 0.72);
+
+  // 引用块
+  --blockquote-color: #5b6cff;
+  --blockquote-bg-color: rgba(91, 108, 255, 0.06);
+
+  // 分页
+  --pagination-link-color: #5b6cff;
+  --pagination-link-hover-color: #4452ff;
+
+  // 圆角/阴影系统
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-brand: 0 8px 24px rgba(91, 108, 255, 0.18);
+
+  // 过渡曲线
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ---------- 深色模式 Token ----------
+html.dark {
+  --brand-primary: #7c8bff;
+  --brand-primary-hover: #9aa6ff;
+  --brand-accent: #22d3ee;
+  --brand-gradient: linear-gradient(135deg, #7c8bff 0%, #22d3ee 100%);
+
+  --global-link-color: #7c8bff;
+  --global-link-hover-color: #22d3ee;
+  --single-link-color: #7c8bff;
+  --single-link-hover-color: #22d3ee;
+
+  // 深空黑背景(比 DoIt 默认的 #0d1117 更纯)
+  --global-background-color: #0a0a0b;
+  --global-font-color: #ededed;
+  --global-font-secondary-color: #a1a1aa;
+  --global-border-color: #232327;
+
+  --selection-color: rgba(124, 139, 255, 0.25);
+
+  --header-background-color: rgba(10, 10, 11, 0.72);
+
+  --blockquote-color: #7c8bff;
+  --blockquote-bg-color: rgba(124, 139, 255, 0.08);
+
+  --pagination-link-color: #7c8bff;
+  --pagination-link-hover-color: #9aa6ff;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-brand: 0 8px 24px rgba(124, 139, 255, 0.22);
+}
+
+// ---------- 全局基础 ----------
+html {
+  // 字体抗锯齿
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  letter-spacing: 0.01em;
+}
+
+// 数字与英文用 Inter,更挺拔(中文不受影响)
+.single-title,
+.home-title,
+.home-subtitle,
+.post-meta,
+.header-title {
+  font-feature-settings: "kern" 1, "liga" 1, "ss01" 1, "cv11" 1;
+}
+
+// ---------- 自定义滚动条 ----------
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.35);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  &:hover {
+    background: var(--brand-primary);
+    background-clip: content-box;
+  }
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(200, 200, 200, 0.25);
+  background-clip: content-box;
+}
+
+// ---------- Header 毛玻璃 ----------
+header {
+  background: var(--header-background-color) !important;
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--global-border-color);
+}
+.header-title {
+  .icon {
+    color: var(--brand-primary);
+  }
+}
+.header-menu {
+  .menu-item {
+    a {
+      transition: color 0.25s var(--ease);
+      &:hover {
+        color: var(--brand-primary) !important;
+      }
+    }
+  }
+}
+
+// ---------- 首页个人资料区(视觉焦点)----------
+.home {
+  .home-profile {
+    padding: 3.5rem 0 2.5rem !important;
+  }
+  .home-avatar {
+    img {
+      border-radius: 50% !important;
+      // 靛蓝→青 渐变光环
+      outline: 3px solid transparent;
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 1),
+        0 0 0 6px var(--brand-primary),
+        var(--shadow-brand);
+      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+      &:hover {
+        transform: scale(1.04);
+        box-shadow:
+          0 0 0 3px rgba(255, 255, 255, 1),
+          0 0 0 6px var(--brand-accent),
+          0 12px 32px rgba(6, 182, 212, 0.28);
+      }
+    }
+  }
+  html.dark .home-avatar img {
+    box-shadow:
+      0 0 0 3px rgba(10, 10, 11, 1),
+      0 0 0 6px var(--brand-primary),
+      var(--shadow-brand);
+  }
+
+  .home-subtitle {
+    font-family: $code-font-family;
+    font-weight: 500;
+    color: var(--brand-primary) !important;
+    // TypeIt 光标用主色
+    .typeit {
+      &::after {
+        color: var(--brand-accent);
+      }
+    }
+  }
+
+  // 社交图标圆形 hover
+  .home-profile .links {
+    a {
+      transition: transform 0.25s var(--ease), color 0.25s var(--ease);
+      &:hover {
+        transform: translateY(-3px) scale(1.1);
+        color: var(--brand-primary);
+      }
+    }
+  }
+}
+
+// ---------- 文章卡片(Summary)----------
+.single.summary {
+  position: relative;
+  margin: 0 0 1.5rem !important;
+  padding: 1.75rem 1.75rem 1.5rem !important;
+  border: 1px solid var(--global-border-color);
+  border-radius: var(--radius-lg);
+  background: var(--global-background-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+
+  // 左侧主色装饰条(hover 时显现)
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--brand-gradient);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.35s var(--ease);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+    &::before {
+      transform: scaleY(1);
+    }
+    .single-title a {
+      color: var(--brand-primary);
+    }
+  }
+
+  .single-title {
+    font-weight: 700;
+    line-height: 1.35;
+    a {
+      transition: color 0.25s var(--ease);
+    }
+  }
+
+  .post-meta {
+    color: var(--global-font-secondary-color);
+    font-size: 0.875rem;
+    margin: 0.5rem 0 1rem;
+    a {
+      color: var(--brand-primary);
+    }
+  }
+
+  .content {
+    color: var(--global-font-secondary-color);
+    line-height: 1.8;
+  }
+
+  // "阅读全文" → 胶囊按钮
+  .post-footer {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--global-border-color);
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--brand-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: gap 0.25s var(--ease), color 0.25s var(--ease);
+      &::after {
+        content: "→";
+        transition: transform 0.25s var(--ease);
+      }
+      &:hover {
+        color: var(--brand-primary-hover);
+        gap: 0.6rem;
+      }
+    }
+    .post-tags a {
+      color: var(--global-font-secondary-color);
+      &:hover {
+        color: var(--brand-primary);
+      }
+    }
+  }
+}
+
+// ---------- 文章正文阅读体验 ----------
+.single {
+  .content {
+    max-width: 760px; // 最佳中文阅读行宽
+    margin: 0 auto;
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    color: var(--global-font-color);
+
+    // 段落间距
+    p {
+      margin: 1.25em 0;
+    }
+
+    // 标题层次
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: 700;
+      line-height: 1.4;
+      margin-top: 2em;
+      scroll-margin-top: 5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      padding-bottom: 0.4em;
+      border-bottom: 1px solid var(--global-border-color);
+      position: relative;
+      &::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 1.1em;
+        background: var(--brand-gradient);
+        border-radius: 2px;
+        vertical-align: -0.15em;
+        margin-right: 0.5em;
+      }
+    }
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    // 链接下划线动画
+    a {
+      color: var(--single-link-color);
+      font-weight: 500;
+      text-decoration: none;
+      background-image: linear-gradient(var(--brand-primary), var(--brand-primary));
+      background-size: 0% 1.5px;
+      background-position: 0 100%;
+      background-repeat: no-repeat;
+      transition: background-size 0.3s var(--ease), color 0.25s var(--ease);
+      &:hover {
+        color: var(--single-link-hover-color);
+        background-size: 100% 1.5px;
+      }
+    }
+
+    // 引用块
+    blockquote {
+      border-left: 4px solid var(--brand-primary) !important;
+      background: var(--blockquote-bg-color) !important;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.8em 1.2em !important;
+      margin: 1.5em 0;
+      color: var(--global-font-color);
+    }
+
+    // 行内代码
+    code {
+      font-family: $code-font-family;
+      font-size: 0.875em;
+      background: rgba(91, 108, 255, 0.1);
+      color: var(--brand-primary);
+      padding: 0.15em 0.4em;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(91, 108, 255, 0.12);
+      html.dark & {
+        background: rgba(124, 139, 255, 0.14);
+        color: var(--brand-primary);
+      }
+    }
+
+    // 代码块
+    .highlight {
+      border-radius: var(--radius-md) !important;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin: 1.5em 0;
+      pre {
+        margin: 0;
+        font-family: $code-font-family;
+        font-size: 0.875rem;
+        line-height: 1.7;
+      }
+      // 代码块标题栏主色化
+      .table-code {
+        .code-title {
+          background: var(--brand-gradient) !important;
+          color: #fff !important;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // 表格
+    table {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin: 1.5em 0;
+      thead {
+        background: var(--brand-gradient) !important;
+        th {
+          color: #fff !important;
+          font-weight: 600;
+        }
+      }
+      tbody tr:nth-child(even) {
+        background: rgba(91, 108, 255, 0.03);
+        html.dark & {
+          background: rgba(124, 139, 255, 0.05);
+        }
+      }
+    }
+
+    // 图片圆角
+    img {
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    // 列表项间距
+    ul,
+    ol {
+      li {
+        margin: 0.4em 0;
+      }
+    }
+  }
+}
+
+// ---------- 目录(TOC)----------
+.toc {
+  .toc-content {
+    a {
+      transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+      border-left: 2px solid transparent;
+      &.active {
+        color: var(--brand-primary) !important;
+        font-weight: 600;
+      }
+    }
+  }
+}
+#toc-auto {
+  .toc-content a.active::before {
+    background: var(--brand-primary) !important;
+  }
+}
+
+// ---------- 分页 ----------
+.pagination {
+  .page-item {
+    .page-link {
+      border-radius: var(--radius-md) !important;
+      margin: 0 0.2rem;
+      border: 1px solid var(--global-border-color) !important;
+      transition: all 0.25s var(--ease);
+      &:hover {
+        background: var(--brand-primary);
+        color: #fff !important;
+        border-color: var(--brand-primary) !important;
+      }
+    }
+    &.active .page-link {
+      background: var(--brand-gradient);
+      color: #fff !important;
+      border-color: transparent !important;
+      font-weight: 600;
+    }
+  }
+}
+
+// ---------- 分类/标签云 ----------
+.archive-item {
+  a {
+    transition: color 0.25s var(--ease);
+    &:hover {
+      color: var(--brand-primary);
+    }
+  }
+}
+.tag-cloud-tags {
+  a {
+    border-radius: var(--radius-md);
+    padding: 0.3em 0.9em !important;
+    margin: 0.3rem;
+    background: rgba(91, 108, 255, 0.08);
+    transition: all 0.25s var(--ease);
+    &:hover {
+      background: var(--brand-gradient);
+      color: #fff !important;
+      transform: translateY(-2px);
+    }
+    html.dark & {
+      background: rgba(124, 139, 255, 0.12);
+    }
+  }
+}
+
+// ---------- 主题切换按钮微调 ----------
+.theme-switch {
+  transition: transform 0.3s var(--ease);
+  &:hover {
+    transform: rotate(20deg);
+  }
+}
+
+// ---------- 搜索框 ----------
+.search-input {
+  &:focus {
+    border-color: var(--brand-primary) !important;
+  }
+}

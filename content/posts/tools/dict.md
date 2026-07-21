@@ -1,0 +1,22 @@
++++
+title = "词典"
+date = "2025-01-12"
+lastmod = "2025-01-12"
+subtitle = "词典"
+description = "词典"
+author = "小智晖"
+authors = ["小智晖"]
+categories = ["tools"]
+tags = ["工具"]
+keywords = []
+toc = true
+draft = false
++++
+
+# 词典
+
+## 英汉词典相关的开源项目
+
+- [MyDict 一个用C语言实现的命令行英汉对照词典](https://github.com/chienlungcheung/MyDict)
+- [Wudao-dict 无道词典,有道词典的命令行版本，支持英汉互查和在线查询。](https://github.com/ChestnutHeng/Wudao-dict)
+- [Dict《牛津英汉词典》 查词](https://github.com/yyt6801/Dict)

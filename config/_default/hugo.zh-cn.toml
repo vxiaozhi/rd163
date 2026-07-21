@@ -1,0 +1,10 @@
+# 中文语言配置
+weight = 1
+# 网站语言 locale
+locale = "zh-CN"
+# 语言名称
+label = "简体中文"
+# 是否包括中日韩文字
+hasCJKLanguage = true
+# 版权描述, 仅仅用于 SEO
+copyright = "本作品采用知识共享署名-非商业性使用 4.0 国际许可协议进行许可。"

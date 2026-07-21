@@ -1,0 +1,36 @@
++++
+title = "Rust 实现的应用有哪些？"
+date = "2025-01-12"
+lastmod = "2025-01-12"
+subtitle = "Rust 实现的应用有哪些？"
+description = "Rust 实现的应用有哪些？"
+author = "小智晖"
+authors = ["小智晖"]
+categories = ["rust"]
+tags = ["编程语言", "rust"]
+keywords = []
+toc = true
+draft = false
++++
+
+# Rust 实现的应用有哪些？
+
+## Web 类
+
+- [web-app-with-rust](../web/web-app-with-rust.md)
+
+
+## 编辑器
+
+- [zed](https://github.com/zed-industries/zed)
+- [Lapce](https://github.com/lapce/lapce) Lightning-fast and Powerful Code Editor written in Rust
+- [Typst](https://github.com/typst/typst) A new markup-based typesetting system that is powerful and easy to learn.
+
+## 在线图像编辑
+
+- [Graphite](https://github.com/GraphiteEditor/Graphite) 一款在线版的图像编辑器，代码开源。
+
+## js编译打包
+
+- [get-started-with-vite.md](../web/get-started-with-vite.md)
+

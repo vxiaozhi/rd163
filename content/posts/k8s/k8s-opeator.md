@@ -1,0 +1,51 @@
++++
+title = "Kubernetes CRD 和 Operator"
+date = "2025-01-12"
+lastmod = "2025-01-12"
+subtitle = "Kubernetes CRD 和 Operator"
+description = "Kubernetes CRD 和 Operator"
+author = "小智晖"
+authors = ["小智晖"]
+categories = ["k8s"]
+tags = ["k8s"]
+keywords = []
+toc = true
+draft = false
++++
+
+# Kubernetes CRD 和 Operator
+
+CRD的全称是CustomResourceDefinition, 是Kubernetes为提高可扩展性，让开发者去自定义资源（如Deployment，StatefulSet等）的一种方法.
+
+```
+Operator = CRD(Customer Resource Define) + Controller
+```
+
+CRD仅仅是资源的定义，而Controller可以去监听CRD的CRUD事件来添加自定义业务逻辑。
+
+如果说只是对CRD实例进行CRUD的话，不需要Controller也是可以实现的，只是只有数据(只会在etcd内生成这个对象)，没有针对数据的操作。
+
+CR约定了这个资源，或者说是应用将要达到的状态。那如何到达这个状态呢？这个时候，就需要一个Controller负责调和（Reconcile）。
+
+Controller将CR规划的应用蓝图落地，并最终实现CR约定的应用状态。Controller和API Server建立通信，并监听特定CR的创建，销毁和更新事件，并在自己的控制循环内，使用K8S Api完成调和的工作。
+
+## 开发方法
+
+- 直接使用 Informer：直接使用 Informer 编写 Controller 需要编写更多的代码，因为我们需要在代码处理更多的底层细节，例如如何在集群中监视资源，以及如何处理资源变化的通知。但是，使用 Informer 也可以更加自定义和灵活，因为我们可以更细粒度地控制 Controller 的行为。
+
+- Controller runtime：Controller runtime 是基于 Informer 实现的，在 Informer 之上为 Controller 编写提供了高级别的抽象和帮助类，包括 Leader Election、Event Handling 和 Reconcile Loop 等等。使用 Controller runtime，可以更容易地编写和测试 Controller，因为它已经处理了许多底层的细节。
+
+- [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder)：和 Informer 及 Controller runtime 不同，Kubebuilder 并不是一个代码库，而是一个开发框架。Kubebuilder 底层使用了 controller-runtime。Kubebuilder 提供了 CRD 生成器和代码生成器等工具，可以帮助开发者自动生成一些重复性的代码和资源定义，提高开发效率。同时，Kubebuilder 还可以生成 Webhooks，以用于验证自定义资源。Kubebuilder的版本和 k8s的版本要对应得上（例如，minikube 1.22, 则Kubebuilder可用 3.2）。
+
+## 常用 Operators
+
+### OpenKruise 
+
+[OpenKruise](https://github.com/openkruise/kruise) 是一个基于 Kubernetes 的扩展套件，主要聚焦于云原生应用的自动化，比如部署、发布、运维以及可用性防护。
+
+OpenKruise 提供的绝大部分能力都是基于 CRD 扩展来定义，它们不存在于任何外部依赖，可以运行在任意纯净的 Kubernetes 集群中。
+
+## 参考
+
+- [Kubernetes CRD 和 Operator](https://github.com/chenzongshu/Kubernetes/blob/master/Kubernetes%20CRD%E5%92%8COperator.md)
+- [Kubernetes Controller 机制详解（一）](https://www.zhaohuabing.com/post/2023-03-09-how-to-create-a-k8s-controller/)

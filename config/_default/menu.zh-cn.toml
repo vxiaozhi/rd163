@@ -1,0 +1,58 @@
+# 菜单配置(中文)
+
+[[main]]
+  identifier = "posts"
+  pre = ""
+  post = ""
+  name = "所有文章"
+  url = "/posts/"
+  title = ""
+  weight = 1
+[[main]]
+  identifier = "categories"
+  pre = ""
+  post = ""
+  name = "分类"
+  url = "/categories/"
+  title = ""
+  weight = 2
+[[main]]
+  identifier = "tags"
+  pre = ""
+  post = ""
+  name = "标签"
+  url = "/tags/"
+  title = ""
+  weight = 3
+[[main]]
+  identifier = "series"
+  pre = ""
+  post = ""
+  name = "系列"
+  url = "/series/"
+  title = ""
+  weight = 4
+[[main]]
+  identifier = "authors"
+  pre = ""
+  post = ""
+  name = "作者"
+  url = "/authors/"
+  title = ""
+  weight = 5
+[[main]]
+  identifier = "about"
+  pre = ""
+  post = ""
+  name = "关于"
+  url = "/about/"
+  title = ""
+  weight = 6
+[[main]]
+  identifier = "github"
+  pre = "<i class='fa-brands fa-github fa-fw' aria-hidden='true'></i>"
+  post = ""
+  name = ""
+  url = "https://github.com/vxiaozhi"
+  title = "GitHub"
+  weight = 7
