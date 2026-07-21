@@ -4,7 +4,7 @@ baseURL = "https://rd163.visword.com/"
 # 默认语言 [en, zh-cn, fr, ...]
 defaultContentLanguage = "zh-cn"
 # 网站标题
-title = "小智晖的博客"
+title = "研发日志 · R&D Log"
 
 # 是否使用 robots.txt
 enableRobotsTXT = true
