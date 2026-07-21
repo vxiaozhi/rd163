@@ -39,7 +39,7 @@ bundle = false
     logo = ""
     # 标题名称
     name = "研发日志 · R&D Log"
-    pre = '<i class="fa-solid fa-microchip fa-fw" aria-hidden="true"></i>'
+    pre = '<i class="fa-solid fa-terminal fa-fw" aria-hidden="true"></i>'
     post = ""
     # 是否为标题显示打字机动画
     typeit = false
