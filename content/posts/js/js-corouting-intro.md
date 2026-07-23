@@ -2,13 +2,13 @@
 title = "Js 协程简介"
 date = "2025-04-13"
 lastmod = "2025-04-13"
-subtitle = "Js 协程简介"
-description = "Js 协程简介"
+subtitle = "从 callback、Promise 到 async/await 的 JavaScript 异步编程演进"
+description = "系统梳理 JavaScript 异步编程的核心方案：从回调地狱出发，逐步引入 Promise 链、错误处理、Promise API、Promisification、微任务队列，最终落地到 async/await 语法。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["js"]
-tags = ["js", "coroutine"]
-keywords = []
+categories = ["JavaScript"]
+tags = ["JavaScript", "异步编程", "Promise", "async/await", "callback", "微任务"]
+keywords = ["JavaScript 异步", "Promise", "async/await", "回调地狱", "微任务队列", "Promise 链"]
 toc = true
 draft = false
 +++
@@ -21,7 +21,7 @@ draft = false
 
 回调地狱：
 
-```
+```js
 loadScript('1.js', function(error, script) {
 
   if (error) {
@@ -47,13 +47,13 @@ loadScript('1.js', function(error, script) {
 });
 ```
 
-嵌套调用的“金字塔”随着每个异步行为会向右增长。很快它就失控了。
+嵌套调用的"金字塔"随着每个异步行为会向右增长。很快它就失控了。
 
 所以这种编码方式不是很好。
 
 我们可以通过使每个行为都成为一个独立的函数来尝试减轻这种问题，如下所示：
 
-```
+```js
 loadScript('1.js', step1);
 
 function step1(error, script) {
@@ -88,11 +88,11 @@ function step3(error, script) {
 
 它可以工作，但是代码看起来就像是一个被撕裂的表格。你可能已经注意到了，它的可读性很差，在阅读时你需要在各个代码块之间跳转。这很不方便，特别是如果读者对代码不熟悉，他们甚至不知道应该跳转到什么地方。
 
-此外，名为 step* 的函数都是一次性使用的，创建它们就是为了避免“厄运金字塔”。没有人会在行为链之外重用它们。因此，这里的命名空间有点混乱。
+此外，名为 step* 的函数都是一次性使用的，创建它们就是为了避免"厄运金字塔"。没有人会在行为链之外重用它们。因此，这里的命名空间有点混乱。
 
 我们希望还有更好的方法。
 
-幸运的是，有其他方法可以避免此类金字塔。最好的方法之一就是 “promise”.
+幸运的是，有其他方法可以避免此类金字塔。最好的方法之一就是 "promise".
 
 ## Promise
 
@@ -102,7 +102,7 @@ function step3(error, script) {
 
 这是基于回调函数的变体，记住它：
 
-```
+```js
 function loadScript(src, callback) {
   let script = document.createElement('script');
   script.src = src;
@@ -118,7 +118,7 @@ function loadScript(src, callback) {
 
 新函数 loadScript 将不需要回调。取而代之的是，它将创建并返回一个在加载完成时 resolve 的 promise 对象。外部代码可以使用 .then 向其添加处理程序（订阅函数）：
 
-```
+```js
 function loadScript(src) {
   return new Promise(function(resolve, reject) {
     let script = document.createElement('script');
@@ -134,7 +134,7 @@ function loadScript(src) {
 
 用法：
 
-```
+```js
 let promise = loadScript("https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.js");
 
 promise.then(
@@ -148,7 +148,7 @@ promise.then(script => alert('Another handler...'));
 我们立刻就能发现 promise 相较于基于回调的模式的一些好处：
 
 - promise 允许我们按照自然顺序进行编码。首先，我们运行 loadScript，之后，用 .then 来处理结果。 callback:在调用 loadScript(script, callback) 时，我们必须有一个 callback 函数可供使用。换句话说，在调用 loadScript 之前，我们必须知道如何处理结果。
-- promise:我们可以根据需要，在 promise 上多次调用 .then。每次调用，我们都会在“订阅列表”中添加一个新的“粉丝”，一个新的订阅函数。callback: 只能有一个回调。
+- promise:我们可以根据需要，在 promise 上多次调用 .then。每次调用，我们都会在"订阅列表"中添加一个新的"粉丝"，一个新的订阅函数。callback: 只能有一个回调。
 
 因此，promise 为我们提供了更好的代码流和灵活性。
 
@@ -162,7 +162,7 @@ Promise 提供了一些方案来做到这一点。
 
 它看起来就像这样：
 
-```
+```js
 new Promise(function(resolve, reject) {
 
   setTimeout(() => resolve(1), 1000); // (*)
@@ -200,7 +200,7 @@ new Promise(function(resolve, reject) {
 
 我们将使用 fetch 方法从远程服务器加载用户信息。它有很多可选的参数，我们在 单独的一章 中对其进行了详细介绍，但基本语法很简单：
 
-```
+```js
 let promise = fetch(url);
 ```
 
@@ -210,7 +210,7 @@ let promise = fetch(url);
 
 下面这段代码向 user.json 发送请求，并从服务器加载该文本：
 
-```
+```js
 fetch('/article/promise-chaining/user.json')
   // 当远程服务器响应时，下面的 .then 开始执行
   .then(function(response) {
@@ -228,7 +228,7 @@ fetch('/article/promise-chaining/user.json')
 
 为了简洁，我们还将使用箭头函数：
 
-```
+```js
 // 同上，但使用 response.json() 将远程内容解析为 JSON
 fetch('/article/promise-chaining/user.json')
   .then(response => response.json())
@@ -239,7 +239,7 @@ fetch('/article/promise-chaining/user.json')
 
 例如，我们可以再向 GitHub 发送一个请求，加载用户个人资料并显示头像：
 
-```
+```js
 // 发送一个对 user.json 的请求
 fetch('/article/promise-chaining/user.json')
   // 将其加载为 JSON
@@ -268,7 +268,7 @@ fetch('/article/promise-chaining/user.json')
 
 就像这样：
 
-```
+```js
 fetch('/article/promise-chaining/user.json')
   .then(response => response.json())
   .then(user => fetch(`https://api.github.com/users/${user.name}`))
@@ -294,7 +294,7 @@ fetch('/article/promise-chaining/user.json')
 
 最后，我们可以将代码拆分为可重用的函数：
 
-```
+```js
 function loadJson(url) {
   return fetch(url)
     .then(response => response.json());
@@ -340,7 +340,7 @@ todo
 - 如果给定 .then 的第二个参数（即 error 处理程序），那么 .then 也会以相同的方式捕获 error。
 - 我们应该将 .catch 准确地放到我们想要处理 error，并知道如何处理这些 error 的地方。处理程序应该分析 error（可以自定义 error 类来帮助分析）并再次抛出未知的 error（它们可能是编程错误）。
 - 如果没有办法从 error 中恢复，不使用 .catch 也可以。
-- 在任何情况下我们都应该有 unhandledrejection 事件处理程序（用于浏览器，以及其他环境的模拟），以跟踪未处理的 error 并告知用户（可能还有我们的服务器）有关信息，以使我们的应用程序永远不会“死掉”。
+- 在任何情况下我们都应该有 unhandledrejection 事件处理程序（用于浏览器，以及其他环境的模拟），以跟踪未处理的 error 并告知用户（可能还有我们的服务器）有关信息，以使我们的应用程序永远不会"死掉"。
 
 ## Promise API
 
@@ -354,7 +354,7 @@ Promise 类有 6 种静态方法：
 
 ## Promisification
 
-对于一个简单的转换来说 “Promisification” 是一个长单词。它指将一个接受回调的函数转换为一个返回 promise 的函数。
+对于一个简单的转换来说 "Promisification" 是一个长单词。它指将一个接受回调的函数转换为一个返回 promise 的函数。
 
 由于许多函数和库都是基于回调的，因此，在实际开发中经常会需要进行这种转换。因为使用 promise 更加方便，所以将基于回调的函数和库 promise 化是有意义的。
 
@@ -362,7 +362,7 @@ Promise 类有 6 种静态方法：
 
 例如，在 简介：回调 一章中我们有 loadScript(src, callback)。
 
-```
+```js
 function loadScript(src, callback) {
   let script = document.createElement('script');
   script.src = src;
@@ -385,7 +385,7 @@ function loadScript(src, callback) {
 
 代码实现如下：
 
-```
+```js
 let loadScriptPromise = function(src) {
   return new Promise((resolve, reject) => {
     loadScript(src, (err, script) => {
@@ -403,7 +403,7 @@ let loadScriptPromise = function(src) {
 
 我们将其称为 promisify(f)：它接受一个需要被 promise 化的函数 f，并返回一个包装（wrapper）函数。
 
-```
+```js
 function promisify(f) {
   return function (...args) { // 返回一个包装函数（wrapper-function） (*)
     return new Promise((resolve, reject) => {
@@ -434,7 +434,7 @@ loadScriptPromise(...).then(...);
 - 当它被以 promisify(f) 的形式调用时，它应该以与上面那个版本的实现的工作方式类似。
 - 当它被以 promisify(f, true) 的形式调用时，它应该返回以回调函数数组为结果 resolve 的 promise。这就是具有很多个参数的回调的结果。
 
-```
+```js
 // promisify(f, true) 来获取结果数组
 function promisify(f, manyArgs = false) {
   return function (...args) {
@@ -474,7 +474,7 @@ promise 的处理程序 .then、.catch 和 .finally 都是异步的。
 
 示例代码如下：
 
-```
+```js
 let promise = Promise.resolve();
 
 promise.then(() => alert("promise done!"));
@@ -490,7 +490,7 @@ alert("code finished"); // 这个 alert 先显示
 
 **微任务队列（Microtask queue）**
 
-异步任务需要适当的管理。为此，ECMA 标准规定了一个内部队列 PromiseJobs，通常被称为“微任务队列（microtask queue）”（V8 术语）。
+异步任务需要适当的管理。为此，ECMA 标准规定了一个内部队列 PromiseJobs，通常被称为"微任务队列（microtask queue）"（V8 术语）。
 
 如 规范 中所述：
 
@@ -498,7 +498,7 @@ alert("code finished"); // 这个 alert 先显示
 只有在 JavaScript 引擎中没有其它任务在运行时，才开始执行任务队列中的任务。
 或者，简单地说，当一个 promise 准备就绪时，它的 .then/catch/finally 处理程序就会被放入队列中：但是它们不会立即被执行。当 JavaScript 引擎执行完当前的代码，它会从队列中获取任务并执行它。
 
-这就是为什么在上面那个示例中 “code finished” 会先显示。
+这就是为什么在上面那个示例中 "code finished" 会先显示。
 
 promise 的处理程序总是会经过这个内部队列。
 
@@ -508,7 +508,7 @@ promise 的处理程序总是会经过这个内部队列。
 
 很简单，只需要像下面这样使用 .then 将其放入队列：
 
-```
+```js
 Promise.resolve()
   .then(() => alert("promise done!"))
   .then(() => alert("code finished"));
@@ -583,7 +583,7 @@ async function f() {
 f();
 ```
 
-这个函数在执行的时候，“暂停”在了 `(*)` 那一行，并在 promise settle 时，拿到 `result` 作为结果继续往下执行。所以上面这段代码在一秒后显示 "done!"。
+这个函数在执行的时候，"暂停"在了 `(*)` 那一行，并在 promise settle 时，拿到 `result` 作为结果继续往下执行。所以上面这段代码在一秒后显示 "done!"。
 
 让我们强调一下：`await` 实际上会暂停函数的执行，直到 promise 状态变为 settled，然后以 promise 的结果继续执行。这个行为不会耗费任何 CPU 资源，因为 JavaScript 引擎可以同时处理其他任务：执行其他脚本，处理事件等。
 

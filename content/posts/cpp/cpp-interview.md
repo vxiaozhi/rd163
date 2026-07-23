@@ -2,13 +2,13 @@
 title = "C/C++面试基础知识"
 date = "2025-05-08"
 lastmod = "2025-05-08"
-subtitle = "C/C++面试基础知识"
-description = "C/C++面试基础知识"
+subtitle = "C/C++ 面试核心知识点速查"
+description = "整理 C/C++ 面试常考基础知识，涵盖 C++ 语言基础、STL、网络（TCP/UDP、HTTP、字节序）等高频考点与原理速览。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["cpp"]
-tags = ["cpp", "interview"]
-keywords = []
+categories = ["cpp", "面试"]
+tags = ["cpp", "interview", "stl", "网络"]
+keywords = ["C++面试", "C++基础", "STL", "TCP", "UDP", "HTTP"]
 toc = true
 draft = false
 +++
@@ -17,7 +17,7 @@ draft = false
 
 ### 如何定义一个只能在堆上（栈上）生成对象的类？
 
-> [如何定义一个只能在堆上（栈上）生成对象的类?](https://www.nowcoder.com/questionTerminal/0a584aa13f804f3ea72b442a065a7618)
+> [如何定义一个只能在堆上（栈上）生成对象的类?](https://www.nowcoder.com/questionPractice/0a584aa13f804f3ea72b442a065a7618)
 
 #### 只能在堆上
 
@@ -79,7 +79,7 @@ draft = false
 
 不过如下的写法也是通的过编译器的：
 
-```
+```cpp
     int *iptr = NULL;
     int& iref = *iptr;
 ```
@@ -88,7 +88,7 @@ draft = false
 
 对指针执行sizeof()操作得到的是指针本身的大小（32位系统为4,64位系统为8）。而对引用执行sizeof()操作，由于引用本身只是一个被引用的别名，所以得到的是所绑定的对象的所占内存大小。
 
-指针的自增(++)运算表示对地址的自增，自增大小要看所指向单元的类型。而引用的自增(++)运算表示对值的自增。
+指针的自增（++）运算表示对地址的自增，自增大小要看所指向单元的类型。而引用的自增（++）运算表示对值的自增。
 
 在作为函数参数进行传递时的区别：指针作为函数传输作为传递时，函数内部的指针形参是指针实参的一个副本，改变指针形参并不能改变指针实参的值，通过解引用*运算符来更改指针所指向的内存单元里的数据。而引用在作为函数参数进行传递时，实质上传递的是实参本身，即传递进来的不是实参的一个拷贝，因此对形参的修改其实是对实参的修改，所以在用引用进行参数传递时，不仅节约时间，而且可以节约空间。
 
@@ -333,7 +333,7 @@ todo
 - HTTP和HTTPS的主要区别
 - 如何设计一个高并发的系统
 
-更多开放性问题参考: [C++面试集锦( 面试被问到的问题 )](https://www.cnblogs.com/Y1Focus/p/6707121.html)
+更多开放性问题参考: [C++面试集锦（ 面试被问到的问题 ）](https://www.cnblogs.com/Y1Focus/p/6707121.html)
 
 ## 参考
 

@@ -2,20 +2,16 @@
 title = "Boinc 后台服务搭建"
 date = "2025-01-12"
 lastmod = "2025-01-12"
-subtitle = "Boinc 后台服务搭建"
-description = "Boinc 后台服务搭建"
+subtitle = "从源码编译、docker-compose 到基于已有项目的三种搭建方案"
+description = "记录 BOINC 分布式计算后台服务的搭建过程，涵盖源码编译安装、docker-compose 部署及基于已有项目的最佳实践方案对比。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["server"]
-tags = ["server", "boinc"]
-keywords = []
+tags = ["server", "boinc", "分布式计算", "docker", "docker-compose"]
+keywords = ["BOINC", "分布式计算", "docker-compose", "志愿计算", "make_project", "服务器搭建"]
 toc = true
 draft = false
 +++
-
-# Boinc 后台服务搭建
-
-
 
 ## 源码编译安装部署
 
@@ -30,7 +26,7 @@ BOINC server programs 运行需要两个不同的用户账号:
 
 创建用户
 
-```
+```bash
 useradd -m {username}
 mkdir -pv /home/{username}
 chown {username}:{username} /home/{username}
@@ -39,25 +35,25 @@ chown {username}:{username} /home/{username}
 默认情况下， apache Web 服务器用户创建的目录不是所有人都可写的。这会导致问题：例如，当文件上传处理程序在上传层次结构中创建一个目录时，在 Fedora 上它归 (apache, apache) 所有，文件删除程序（以 boincadm 身份运行）将无法删除那里的文件。
 因此需要将 web账号添加到 boincadm 组中。
 
-```
+```bash
 $ usermod -a -G boincadm apache
 ```
 
 给boincadm账号添加sudo权限
 
-```
+```bash
 sudo visudo
 ```
 
 In this file you have to add another line after the line for notroot. You can use this:
 
-```
+```bash
 {username} ALL=(ALL) ALL
 ```
 
 **MySQL**
 
-```
+```sql
 mysql -u root -p
 CREATE USER 'boincadm'@'localhost' IDENTIFIED BY 'foobar';
 GRANT ALL ON *.* TO 'boincadm'@'localhost';
@@ -65,7 +61,7 @@ GRANT ALL ON *.* TO 'boincadm'@'localhost';
 
 **安装及配置Apache 和 PHP**
 
-```
+```bash
 apt-get install apache2 php libapache2-mod-php
 ```
 
@@ -75,7 +71,7 @@ apt-get install apache2 php libapache2-mod-php
 
 所谓的server 其实是 一个cgi调度程序及一堆工具。
 
-```
+```bash
 cd ~
 git clone https://github.com/BOINC/boinc.git boinc-src
 cd ~/boinc-src
@@ -87,38 +83,38 @@ make install
 
 编译安装完成后的目录结构如下：
 
-```
+```text
 $ tree -d /usr/local/boinc/
 /usr/local/boinc/
 ├── include
-│   └── boinc
+│   └── boinc
 ├── lib
-│   └── pkgconfig
+│   └── pkgconfig
 ├── libexec
-│   ├── boinc-apps-examples
-│   └── boinc-server-maker
-│       ├── lib
-│       ├── sched
-│       ├── tools
-│       └── vda
+│   ├── boinc-apps-examples
+│   └── boinc-server-maker
+│       ├── lib
+│       ├── sched
+│       ├── tools
+│       └── vda
 ├── share
-│   └── boinc-server-maker
-│       ├── db
-│       └── html
-│           ├── inc
-│           │   ├── password_compat
-│           │   ├── random_compat
-│           │   └── ReCaptcha
-│           │       └── RequestMethod
-│           ├── languages
-│           │   └── translations
-│           ├── ops
-│           │   ├── ffmail
-│           │   ├── mass_email
-│           │   └── remind_email
-│           └── user
-│               └── img
-│                   └── flags
+│   └── boinc-server-maker
+│       ├── db
+│       └── html
+│           ├── inc
+│           │   ├── password_compat
+│           │   ├── random_compat
+│           │   └── ReCaptcha
+│           │       └── RequestMethod
+│           ├── languages
+│           │   └── translations
+│           ├── ops
+│           │   ├── ffmail
+│           │   ├── mass_email
+│           │   └── remind_email
+│           └── user
+│               └── img
+│                   └── flags
 └── usr
     └── share
         └── boinc-server-maker
@@ -130,84 +126,84 @@ $ tree -d /usr/local/boinc/
 
 其中，核心调度程序cgi 及tools 均在 /usr/local/boinc/libexec/boinc-server-maker/ 目录下：
 
-```
+```text
 $ tree /usr/local/boinc/libexec/boinc-server-maker/
 /usr/local/boinc/libexec/boinc-server-maker/
 ├── lib
-│   ├── crypt_prog
-│   └── parse_test
+│   ├── crypt_prog
+│   └── parse_test
 ├── sched
-│   ├── adjust_user_priority
-│   ├── antique_file_deleter
-│   ├── assimilator.py
-│   ├── census
-│   ├── cgi
-│   ├── cleanlogs.sh
-│   ├── credit_test
-│   ├── db_dump
-│   ├── db_dump_spec.xml
-│   ├── db_purge
-│   ├── delete_file
-│   ├── feeder
-│   ├── file_deleter
-│   ├── file_upload_handler
-│   ├── get_file
-│   ├── makelog.sh
-│   ├── make_work
-│   ├── message_handler
-│   ├── put_file
-│   ├── pymw_assimilator.py
-│   ├── run_in_ops
-│   ├── sample_assimilator
-│   ├── sample_bitwise_validator
-│   ├── sample_dummy_assimilator
-│   ├── sample_substr_validator
-│   ├── sample_trivial_validator
-│   ├── sample_work_generator
-│   ├── sched_driver
-│   ├── script_assimilator
-│   ├── script_validator
-│   ├── show_shmem
-│   ├── single_job_assimilator
-│   ├── size_regulator
-│   ├── start
-│   ├── status
-│   ├── stop
-│   ├── transitioner
-│   ├── transitioner_catchup.php
-│   ├── trickle_credit
-│   ├── trickle_deadline
-│   ├── trickle_echo
-│   ├── update_stats
-│   └── wu_check
+│   ├── adjust_user_priority
+│   ├── antique_file_deleter
+│   ├── assimilator.py
+│   ├── census
+│   ├── cgi
+│   ├── cleanlogs.sh
+│   ├── credit_test
+│   ├── db_dump
+│   ├── db_dump_spec.xml
+│   ├── db_purge
+│   ├── delete_file
+│   ├── feeder
+│   ├── file_deleter
+│   ├── file_upload_handler
+│   ├── get_file
+│   ├── makelog.sh
+│   ├── make_work
+│   ├── message_handler
+│   ├── put_file
+│   ├── pymw_assimilator.py
+│   ├── run_in_ops
+│   ├── sample_assimilator
+│   ├── sample_bitwise_validator
+│   ├── sample_dummy_assimilator
+│   ├── sample_substr_validator
+│   ├── sample_trivial_validator
+│   ├── sample_work_generator
+│   ├── sched_driver
+│   ├── script_assimilator
+│   ├── script_validator
+│   ├── show_shmem
+│   ├── single_job_assimilator
+│   ├── size_regulator
+│   ├── start
+│   ├── status
+│   ├── stop
+│   ├── transitioner
+│   ├── transitioner_catchup.php
+│   ├── trickle_credit
+│   ├── trickle_deadline
+│   ├── trickle_echo
+│   ├── update_stats
+│   └── wu_check
 ├── tools
-│   ├── appmgr
-│   ├── boinc_submit
-│   ├── cancel_jobs
-│   ├── create_work
-│   ├── dbcheck_files_exist
-│   ├── dir_hier_move
-│   ├── dir_hier_path
-│   ├── grep_logs
-│   ├── gui_urls.xml
-│   ├── make_project
-│   ├── manage_privileges
-│   ├── parse_config
-│   ├── project.xml
-│   ├── query_job
-│   ├── remote_submit_test
-│   ├── run_in_ops
-│   ├── sample_assimilate.py
-│   ├── sign_executable
-│   ├── stage_file
-│   ├── stage_file_native
-│   ├── submit_batch
-│   ├── submit_buda
-│   ├── submit_job
-│   ├── update_versions
-│   ├── upgrade
-│   ├── vote_monitor
-│   └── xadd
+│   ├── appmgr
+│   ├── boinc_submit
+│   ├── cancel_jobs
+│   ├── create_work
+│   ├── dbcheck_files_exist
+│   ├── dir_hier_move
+│   ├── dir_hier_path
+│   ├── grep_logs
+│   ├── gui_urls.xml
+│   ├── make_project
+│   ├── manage_privileges
+│   ├── parse_config
+│   ├── project.xml
+│   ├── query_job
+│   ├── remote_submit_test
+│   ├── run_in_ops
+│   ├── sample_assimilate.py
+│   ├── sign_executable
+│   ├── stage_file
+│   ├── stage_file_native
+│   ├── submit_batch
+│   ├── submit_buda
+│   ├── submit_job
+│   ├── update_versions
+│   ├── upgrade
+│   ├── vote_monitor
+│   └── xadd
 └── vda
     ├── ssim
     ├── vda
@@ -226,7 +222,7 @@ docker 部署相比较源码安装方式会简单很多。
 
 参考 [Boinc Server Docker](https://github.com/marius311/boinc-server-docker)
 
-```
+```bash
 git clone https://github.com/marius311/boinc-server-docker.git
    cd boinc-server-docker
    docker-compose pull
@@ -235,7 +231,7 @@ git clone https://github.com/marius311/boinc-server-docker.git
 
 执行 docker-compose up 前， 确定 .env 中 的URL_BASE 设置正常
 
-```
+```ini
 # the URL the server thinks its at
 URL_BASE=http://127.0.0.1
 
@@ -277,7 +273,7 @@ TAG=
 
 **拉取项目代码到本地**
 
-```
+```bash
 sudo mkdir  /data/home/boinc-app-server 
 sudo chown  -R lighthouse  /data/home/boinc-app-server/ 
 
@@ -299,7 +295,7 @@ sudo chmod  -R 777 boinc_app_project
 
 .env
 
-```
+```ini
 # the URL the server thinks its ats
 URL_BASE=https://test-app.test.com
 ```
@@ -307,14 +303,14 @@ URL_BASE=https://test-app.test.com
 
 boinc_app_project/html/user/schedulers.txt
 
-```
+```xml
 <!-- <scheduler>https://test-app.test.com/boinc_app_cgi/cgi</scheduler> -->
 <link rel="boinc_scheduler" href="https://test-app.test.com/boinc_app_cgi/cgi">
 ```
 
 config.xml
 
-```
+```xml
 <upload_url>http://test-app.test.com/boinc_app_cgi/file_upload_handler</upload_url>
 <download_url>http://test-app.test.com/boinc_app/download</download_url>
 <master_url>http://test-app.test.com/boinc_app/</master_url>
@@ -323,7 +319,7 @@ config.xml
 
 如果需要修改db 配置，修改如下字段即可：
 
-```
+```xml
 <db_user>boincadm</db_user>
 <db_name>boinc_app</db_name>
 <db_passwd>boinc_app@xxx</db_passwd>
@@ -335,7 +331,7 @@ config.xml
 
 先启动服务
 
-```
+```bash
 docker-compose pull
 docker-compose up -d
 ```
@@ -343,7 +339,7 @@ docker-compose up -d
 
 创建db账号及权限：
 
-```
+```bash
 docker-compose exec -it mysql bash
 mysql  -u root 
 
@@ -356,7 +352,7 @@ exit;
 
 初始化DB表：
 
-```
+```bash
 cd /data/home/boinc-app-server/
 export PROJECT_ROOT=/home/boincadm/project
 docker run -it --rm --network=container:boinc-app-server-mysql-1 -v $PWD/boinc_app_project:$PROJECT_ROOT \
@@ -373,7 +369,7 @@ PYTHONPATH=/usr/local/boinc/py python -c """if 1:
 
 继续完成最后的初始化：
 
-```
+```bash
 docker-compose exec -it apache bash
 
 cd html/ops && ./db_schemaversion.php > ${PROJECT_ROOT}/db_revision
@@ -385,7 +381,7 @@ yes | ./bin/update_versions
 
 **启动服务**
 
-```
+```bash
 docker-compose down
 docker-compose up -d
 ./bin/stop
@@ -394,7 +390,7 @@ docker-compose up -d
 
 也可以执行以下命令将 start 命令的执行添加到 crontab, 默认会每5分钟执行一次。
 
-```
+```bash
 crontab  {project}.cronjob
 ```
 
@@ -402,13 +398,3 @@ crontab  {project}.cronjob
 至此，部署完毕， 可通过如下链接打开项目主页：
 
 https://test-app.test.com/boinc_app/ 
-
-
-
-
-
-
-
-
-
-

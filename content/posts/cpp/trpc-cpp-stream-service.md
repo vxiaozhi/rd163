@@ -2,13 +2,13 @@
 title = "trpc-cpp流式服务"
 date = "2025-04-01"
 lastmod = "2025-04-01"
-subtitle = "trpc-cpp流式服务"
-description = "trpc-cpp流式服务"
+subtitle = "从启动流程到流任务调度的源码分析"
+description = "分析 trpc-cpp 流式 RPC 的应用场景、三种流式方法，以及 fiber 线程模型下流任务调度的启动流程与源码实现。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["cpp"]
-tags = ["cpp", "trpc"]
-keywords = []
+tags = ["cpp", "trpc", "trpc-cpp", "rpc", "fiber", "streaming"]
+keywords = ["trpc-cpp", "流式RPC", "fiber线程模型", "stream任务调度", "gRPC", "源码分析"]
 toc = true
 draft = false
 +++
@@ -71,7 +71,7 @@ tRPC 协议的流式服务支持两种线程模型：
 
 **fiber 启动流程**
 
-```
+```text
 int InitFrameworkRuntime():trpc/common/runtime_manager.cc
   - void fiber::StartRuntime() :trpc/runtime/fiber_runtime.cc(这里会读取配置中的 fiber 线程模型，根据线程模型决定启动哪一种 ThreadModel)
     - void FiberThreadModel::Start()
@@ -85,7 +85,7 @@ int InitFrameworkRuntime():trpc/common/runtime_manager.cc
 
 Schedule 循环调用 AcquireFiber 获取一个 fiber 进行运行：
 
-```
+```cpp
 void SchedulingImpl::Schedule() noexcept {
   while (true) {
     auto fiber = AcquireFiber();
@@ -115,7 +115,7 @@ void SchedulingImpl::Schedule() noexcept {
 
 AcquireFiber 从 run_queue 中获取一个 fiber实体，代码如下：
 
-```
+```cpp
 FiberEntity* SchedulingImpl::AcquireFiber() noexcept {
   if (auto rc = GetOrInstantiateFiber(run_queue_.Pop())) {
     {
@@ -153,7 +153,7 @@ FiberEntity* SchedulingImpl::AcquireFiber() noexcept {
 
 流调度器的初始化在这里：
 
-```
+```cpp
 CommonStream::CommonStream(StreamOptions&& options) : options_(std::move(options)) {
   if (options_.fiber_mode) {
     fiber_entity_ = MakeRefCounted<FiberStreamJobScheduler>(
@@ -168,7 +168,7 @@ CommonStream::CommonStream(StreamOptions&& options) : options_(std::move(options
 
 处理接收流消息的入口函数：
 
-```
+```cpp
 RetCode CommonStream::HandleRecvMessage(StreamRecvMessage&& msg) {
   TRPC_FMT_TRACE("stream, handle recv message, stream id: {}, message category: {}", GetId(),
                  StreamMessageCategoryToString(StreamMessageCategory{msg.metadata.stream_frame_type}));
@@ -215,21 +215,21 @@ RetCode CommonStream::HandleRecvMessage(StreamRecvMessage&& msg) {
 
 
 FiberStreamHandler注册：
-```
+```text
 - void TrpcServerStreamConnectionHandler::Init(const BindInfo* bind_info, Connection* conn)
 - ServerStreamHandlerFactory::GetInstance()->Create(proto:trpc/grpc, options) [trpc/stream/stream_handler_manager.cc::InitStreamHandler()这里实现各种协议注册]
 - StreamReaderWriterProviderPtr TrpcServerStreamHandler::CreateStream(StreamOptions&& options)
 ```
 
-```
+```text
 - FiberTrpcServerStreamConnectionHandler::int HandleStreamMessage(const ConnectionPtr& conn, std::any& msg)
-- int TrpcServerStreamConnectionHandler::HandleStreamMessage(const BindInfo* bind_info, const ConnectionPtr& conn, std::any& msg)
+- int TrpcServerStreamConnectionHandler::HandleStreamMessages(const BindInfo* bind_info, const ConnectionPtr& conn, std::any& msg)
 - 
 
 ```
 
 从这里开始，将进入收包流程，如下：
-```
+```text
 - RetCode TrpcServerStream::HandleInit(StreamRecvMessage&& msg) 
   - RetCode CommonStream::PushSendMessage(StreamSendMessage&& msg, bool push_front)
     - RetCode FiberStreamJobScheduler::PushSendMessage(StreamSendMessage&& msg, bool push_front)
@@ -241,7 +241,7 @@ FiberStreamHandler注册：
 
 QueueRunnableEntity 最终把包放入到 running_queue_ 中，与上面的fiber启动流程刚好对接上。
 
-```
+```cpp
 bool SchedulingImpl::QueueRunnableEntity(RunnableEntity* entity,
                                          bool sg_local, bool wait) noexcept {
   TRPC_DCHECK(!stopped_.load(std::memory_order_relaxed), "The scheduling group has been stopped.");

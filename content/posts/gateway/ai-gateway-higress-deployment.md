@@ -2,13 +2,13 @@
 title = "AI网关-Higress部署"
 date = "2025-03-23"
 lastmod = "2025-03-23"
-subtitle = "AI网关-Higress部署"
-description = "AI网关-Higress部署"
+subtitle = "Higress 的四种部署方式与 hgctl/Helm 实践及控制台配置要点"
+description = "梳理 Higress AI 网关的云原生、Docker Compose、All-In-One 与 hgctl 四种部署方式,并以 hgctl/Helm 部署到 K8s 为例给出实践命令,附 Higress Console 路由与配置说明。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["gateway"]
-tags = ["gateway"]
-keywords = []
+tags = ["gateway", "higress", "ai-gateway", "k8s", "helm", "hgctl"]
+keywords = ["Higress", "AI 网关", "Kubernetes 部署", "hgctl", "Helm", "Envoy"]
 toc = true
 draft = false
 +++
@@ -37,7 +37,7 @@ draft = false
 
 实例：
 
-```
+```bash
 mkdir higress; cd higress
 docker run -d --rm --name higress-ai -v ${PWD}:/data \
         -p 8001:8001 -p 8080:8080 -p 8443:8443  \
@@ -61,12 +61,12 @@ hgctl 是一个命令行工具，用于管理 Higress 的配置，如：
 
 **如何知道 Higress Chat 包有哪些版本**
 
-```
+```bash
 helm repo add higress.io https://higress.io/helm-charts
 helm search repo  higress.io/higress  --versions
 ```
 higress 当前最新版本为：2.0.7
-```
+```text
 % helm search repo   higress.io/higress  --versions
 NAME                      	CHART VERSION	APP VERSION	DESCRIPTION
 higress.io/higress        	2.0.7        	2.0.7      	Helm chart for deploying Higress gateways
@@ -93,7 +93,7 @@ higress.io/higress        	1.1.1        	1.1.1      	Helm chart for deploying Hi
 higress.io/higress        	1.1.0        	1.1.0      	Helm chart for deploying Higress gateways
 higress.io/higress        	1.0.1        	1.0.1      	Helm chart for deploying Higress gateways
 higress.io/higress        	1.0.0        	1.0.0      	Helm chart for deploying Higress gateways
-higress.io/higress        	0.7.4        	0.7.4      	Helm chart for deploying Higress gateways
+higress.io/higress        	0.7.4        	0.7.4      	Helm chart for deploying higress gateways
 higress.io/higress        	0.7.3        	0.7.3      	Helm chart for deploying higress gateways
 higress.io/higress        	0.7.2        	0.7.2      	Helm chart for deploying higress gateways
 higress.io/higress        	0.7.1        	0.7.1      	Helm chart for deploying higress gateways
@@ -162,7 +162,7 @@ higress.io/higress-local  	0.6.1        	0.6.1      	Helm chart for deploying hi
 
 **如何查看Higress Chart包内容**
 
-```
+```bash
 # 先从私有仓库拉取（需先添加仓库）
 helm repo add higress.io https://higress.io/helm-charts
 
@@ -175,7 +175,7 @@ helm pull  higress.io/higress --version 2.0.7
 
 ### 以hgctl部署higress到k8s为例
 
-```
+```bash
 # 安装hgctl
 curl -Ls https://raw.githubusercontent.com/alibaba/higress/main/tools/hack/get-hgctl.sh | bash
 
@@ -198,7 +198,7 @@ hgctl uninstall --purge-resources  --context string --kubeconfig string
 
 ### 以 Helm 部署higress到k8s为例
 
-```
+```bash
 helm --kubeconfig ./kube_config_xxx.yaml repo add higress.io https://higress.io/helm-charts
 
 helm upgrade --install --kubeconfig ./kube_config_xxx.yaml higress higress.io/higress   --version 2.0.7  -n higress-gateway-test \
@@ -214,7 +214,7 @@ helm upgrade --install --kubeconfig ./kube_config_xxx.yaml higress higress.io/hi
 
 Envoy 启动是， 会在 localhost:15000 监听，用于 Admin 管理， 通过以下命令dump Envoy 配置。
 
-```
+```bash
 curl http://127.0.0.1:15000/config_dump
 ```
 
@@ -237,7 +237,7 @@ Higress Console 中各项配置本质上就是 K8s 资源
 
 [配置路由执行 gRPC 服务](https://higress.cn/docs/latest/ops/how-tos/grpc-upstream/?spm=36971b57.35684624.0.0.67a94767pTZS2Z)：
 
-```
+```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -264,11 +264,10 @@ spec:
 
 用户名密码作为 Secrets 资源，名为：higress-console，数据格式如下：
 
-```
+```yaml
 data:
   adminDisplayName: YWRtaW4=
   adminPassword: YWRtaW4=
   adminUsername: YWRtaW4=
 ```
-
 

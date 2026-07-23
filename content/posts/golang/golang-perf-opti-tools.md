@@ -2,13 +2,13 @@
 title = "golang 性能优化工具"
 date = "2025-04-14"
 lastmod = "2025-04-14"
-subtitle = "golang 性能优化工具"
-description = "golang 性能优化工具"
+subtitle = "pprof、trace、bench 等内置工具的用法与原理"
+description = "系统梳理 Golang 内置性能优化分析工具，涵盖 pprof、trace、go test -bench、expvar、dlv、gops 的使用方式、原理说明与适用场景。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["golang"]
-tags = ["golang", "performance"]
-keywords = []
+categories = ["golang", "性能优化"]
+tags = ["golang", "performance", "pprof", "trace", "基准测试", "性能剖析"]
+keywords = ["golang 性能优化", "pprof", "trace", "火焰图", "基准测试", "性能剖析"]
 toc = true
 draft = false
 +++
@@ -72,7 +72,7 @@ http://localhost:8080/ui/
 
 当然可视化分析也可以和上一步的采样合并到一个命令执行， 如下：
 
-```
+```bash
 go tool pprof -http=:8080 "http://localhost:6060/debug/pprof/profile?seconds=30"
 Fetching profile over HTTP from http://localhost:6060/debug/pprof/profile?seconds=30
 Saved profile in /Users/lh/pprof/pprof.test.samples.cpu.005.pb.gz
@@ -82,7 +82,7 @@ Serving web UI on http://localhost:8080
 
 有时可能存在网络隔离问题，不能直接从开发机访问测试机、线上机器，或者测试机、线上机器没有安装go，那也可以这么做：
 
-```
+```bash
 curl http://localhost:6060/debug/pprof/heap?seconds=30 > heap.out
 
 # sz下载heap.out到本地
@@ -102,7 +102,7 @@ go tool pprof -http=:8080 heap.out
 
 在分析内存时，我们需要有能力区分哪些内存分配是正常情况，哪些情况是异常情况。pprof提供了另外一个有用的选项-diff_base，我们可以在没有服务没有请求时采样30s生成一个采样文件，然后有请求时，我们再采样30s生成另一个采样文件，并将两个采样文件进行对比。这样就容易分析出请求出现时，到底发生了什么。
 
-```
+```bash
 go tool pprof -http=':8080'           \
    -diff_base heap-new-16:22:04:N.out \
    heap-new-17:32:38:N.out

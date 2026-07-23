@@ -2,18 +2,16 @@
 title = "kubernetes 网络模型"
 date = "2025-01-12"
 lastmod = "2025-01-12"
-subtitle = "kubernetes 网络模型"
-description = "kubernetes 网络模型"
+subtitle = "从容器间通信到跨节点、Service 与 Ingress 的全链路解析"
+description = "系统梳理 Kubernetes 网络模型：Pod 内容器通信、同节点与跨节点 Pod 通信、CNI 插件(flannel/calico 等)、Service 负载均衡(iptables/ipvs)以及出入流量路径。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["k8s"]
-tags = ["k8s"]
-keywords = []
+categories = ["k8s", "网络"]
+tags = ["k8s", "kubernetes", "网络模型", "CNI", "flannel", "Service", "iptables"]
+keywords = ["kubernetes 网络模型", "k8s 网络", "CNI", "flannel", "calico", "iptables", "ipvs", "Service", "Ingress"]
 toc = true
 draft = false
 +++
-
-# kubernetes 网络模型
 
 ## K8s通信原理
 
