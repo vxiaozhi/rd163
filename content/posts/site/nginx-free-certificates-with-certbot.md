@@ -2,78 +2,76 @@
 title = "使用 Certbot 为 Nginx 网站服务器设置永久免费的 HTTPS 证书"
 date = "2025-01-13"
 lastmod = "2025-01-13"
-subtitle = "使用 Certbot 为 Nginx 网站服务器设置永久免费的 HTTPS 证书"
-description = "使用 Certbot 为 Nginx 网站服务器设置永久免费的 HTTPS 证书"
+subtitle = "基于 Webroot 模式申请 Let's Encrypt 证书并配置自动续签"
+description = "介绍在 Nginx 上使用 Certbot 的 Webroot 模式申请 Let's Encrypt 免费 HTTPS 证书,并配置 cron 定时任务实现自动续签的完整流程。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["site"]
-tags = ["建站", "certbot"]
-keywords = []
+tags = ["建站", "Nginx", "Certbot", "HTTPS", "Let's Encrypt"]
+keywords = ["Certbot", "Nginx", "HTTPS", "Let's Encrypt", "免费证书", "Webroot"]
 toc = true
 draft = false
 +++
 
-# 使用 Certbot 为 Nginx 网站服务器设置永久免费的 HTTPS 证书
+目前流行的免费 HTTPS 证书申请方案主要有两种:
 
-目前流行的设置https证书的方案有2种：
+- [acme.sh](https://github.com/acmesh-official/acme.sh):采用纯 Shell 实现，拥有完善的中文文档，依赖少，适合脚本化场景。
+- [Certbot](https://certbot.eff.org/):由 EFF(Electronic Frontier Foundation)维护，官方文档完善，与 Let's Encrypt 配套使用最为广泛。
 
-- [acme](https://github.com/acmesh-official/acme.sh) 采用纯Shell实现， 并且有完善的中文文档。【只能支持Nginx配置安装在标准目录，如果自定义了配置目录，则无法使用】
-- certbot
+本文介绍第二种方式，即在 Nginx 上使用 Certbot 的 Webroot 模式申请并自动续签证书。
 
-本文介绍第二种方式。
-
-参考 [使用Nginx结合CertBot配置HTTPS协议](https://developer.aliyun.com/article/689901)
-
+参考:[使用 Nginx 结合 CertBot 配置 HTTPS 协议](https://developer.aliyun.com/article/689901)
 
 ## Certbot 安装
 
-官网: https://certbot.eff.org
+官网:<https://certbot.eff.org>
 
-官方安装文档: https://certbot.eff.org/lets-encrypt/centosrhel7-nginx
+官方提供了交互式的安装指引，可在 <https://certbot.eff.org/instructions> 选择对应的操作系统与 Web 服务器获取最新命令。
 
-Certbot 打包在 EPEL Enterprise Linux(企业版 Linux 的扩展包)上。使用 Certbot,必须先开启 EPEL 仓库。
-在 RHEL 或 Oracle Linux 中,还要必须开启可选频道。可以执行如下命令安装 Certbot
+Certbot 打包在 EPEL(Extra Packages for Enterprise Linux，企业版 Linux 扩展包)仓库中，使用前必须先启用 EPEL 仓库;在 RHEL 或 Oracle Linux 中还需启用可选频道（optional channel）。可执行如下命令安装 Certbot:
 
-```
+```bash
 sudo yum install epel-release
 sudo yum install certbot
 ```
 
+> 说明:CentOS 7 已于 2024 年 6 月停止维护（EOL）。若你使用的是较新的系统（如 RHEL 8/9、CentOS Stream、Rocky Linux、AlmaLinux 等）,建议优先参考官方指引，使用 `dnf` 或推荐的 `snap`/`pip` 方式安装。
+
 ## 生成证书
 
-我们需要配置 Nginx 来做服务器域名验证，因为 CertBot 的 standalone 模式虽然可以配置好服务器，但是每次 90 天到期续签的时候，需要让服务停止一下，再启动。因此我们改用 Webroot 配置模式来验证，Webroot 配置模式下 CertBot 会生成一个随机文件，然后 CertBot 服务器通过 HTTP 的方式访问我们服务器上的这个文件进行验证。所以我们需要配置好 Nginx，以便 CertBot 服务器可以访问到这个随机文件。
+我们需要先配置 Nginx 来完成服务器域名验证。Certbot 的 standalone 模式虽然能直接签发证书，但每次 90 天到期续签时都需要短暂停止 Web 服务再启动，会中断访问。因此本文改用 **Webroot 模式**:Certbot 会在指定的 Web 根目录下生成一个随机验证文件，Let's Encrypt 服务器通过 HTTP 访问该文件来确认域名所有权。这样续签时无需停机。
 
-修改 Nginx 配置，新增一个 server 模块：
+修改 Nginx 配置，在 80 端口的 server 模块中新增一个 location:
 
-```
-    server {
-        listen       80;
-        server_name  your.domain.com; #这里填你要验证的域名
+```nginx
+server {
+    listen       80;
+    server_name  your.domain.com; # 这里填你要验证的域名
 
-        location ^~ /.well-known/acme-challenge/ {
-            default_type "text/plain";
-            root     /usr/share/nginx/html/; #这里需要与后文 --webroot -w 后面配置的路径一致
-        }
+    location ^~ /.well-known/acme-challenge/ {
+        default_type "text/plain";
+        root         /usr/share/nginx/html/; # 需与下文 --webroot -w 的路径一致
     }
+}
 ```
 
-ok，重启 Nginx
+配置完成后，重载 Nginx:
 
-```
+```bash
 sudo service nginx reload
 ```
 
-然后执行
+然后执行证书申请命令:
 
-```
+```bash
 sudo certbot certonly --webroot -w /usr/share/nginx/html/ -d your.domain.com
 ```
 
-记得替换 your.domain.com 为你自己的域名。
+记得将 `your.domain.com` 替换为你自己的域名。
 
-如果看到有提示：
+如果看到类似下面的提示，说明证书生成成功:
 
-```
+```text
 IMPORTANT NOTES:
  - Congratulations! Your certificate and chain have been saved at
    /etc/letsencrypt/live/your.domain.com/fullchain.pem. Your cert
@@ -86,60 +84,59 @@ IMPORTANT NOTES:
    Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
    Donating to EFF:                    https://eff.org/donate-le
 ```
-证书生成成功！
 
-接着可以开始启用 443 端口
+接着启用 443 端口。修改 Nginx 配置文件，新建一个 443 端口的 server 配置:
 
-修改 Nginx 的配置文件，新建一个 443 端口的 server 配置：
-
-```
+```nginx
 server {
     listen 443 ssl;
     listen [::]:443 ssl ipv6only=on;
 
-    ssl_certificate /etc/letsencrypt/live/your.domain.com/fullchain.pem;
+    ssl_certificate     /etc/letsencrypt/live/your.domain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/your.domain.com/privkey.pem;
     ssl_trusted_certificate /etc/letsencrypt/live/your.domain.com/chain.pem;
 
-    // ... other settings ...
+    # ... 其他配置项 ...
 }
 ```
 
-记得替换 your.domain.com 为你自己的域名哦。
+记得将 `your.domain.com` 替换为你自己的域名。
 
-重启 Nginx
+再次重载 Nginx:
 
-```
+```bash
 sudo service nginx reload
 ```
-这时候的网站基本完成免费 HTTPS 证书的设置。成功！
+
+至此，网站已成功启用免费的 HTTPS 证书。
+
+> 提示:nginx 1.25.1 起弃用了 `listen ... ssl http2` 的组合写法，如需启用 HTTP/2，应改用独立的 `http2 on;` 指令。
 
 ## 删除证书
 
-如果因为种种原因不小心生成了多余的证书，他会存在于我们的服务器中，导致无用的冗余。可是官方其实并没有提供取消授权的方式，我们可以在本地删除授权证书，并且不再续签，便可以释放该证书了，我们需要进入对应的文件夹内，查看自己已经生成的证书域名文件夹，然后依次删除就好，记得替换 your.domain.com 为你要删除的域名哦:
+如果因为种种原因生成了多余的证书，它们会一直留在服务器上造成冗余。Let's Encrypt 官方并未提供"取消授权"的接口，但可以在本地删除证书文件并停止续签，从而释放该证书。进入对应目录，查看已生成的证书域名文件夹，然后依次删除即可(记得将 `your.domain.com` 替换为你要删除的域名):
 
-```
+```bash
 cd /etc/letsencrypt/live/
 ls
-sudo rm -rf /etc/letsencrypt/live/your.domain.com/ 
+sudo rm -rf /etc/letsencrypt/live/your.domain.com/
 sudo rm -rf /etc/letsencrypt/archive/your.domain.com/
-sudo rm /etc/letsencrypt/renewal/your.domain.com.conf
+sudo rm -f /etc/letsencrypt/renewal/your.domain.com.conf
 ```
 
-## 设置自动更新
+## 设置自动续签
 
-由于这个免费证书的时效只有 90 天，所以我们需要设置自动更新，帮我们自动更新证书的时效。
-自动更新可以使用 Linux 系统的 cron 定时任务功能，CentOS 可以使用 crontab 命令
+由于 Let's Encrypt 的免费证书有效期只有 90 天，需要设置自动续签任务来定期刷新证书。
 
-我们先命令行模拟证书更新：
+在 CentOS 等系统上可以使用 `crontab` 配置定时任务。先在命令行模拟一次续签:
 
-```
+```bash
 sudo certbot renew --dry-run
 ```
 
-如果有提示下面的内容，表示模拟更新成功
+如果出现类似下面的提示，说明模拟续签成功:
 
-```
+```text
 -------------------------------------------------------------------------------
 Processing /etc/letsencrypt/renewal/your.domain.com.conf
 -------------------------------------------------------------------------------
@@ -152,18 +149,25 @@ Congratulations, all renewals succeeded. The following certs have been renewed:
 **          (The test certificates above have not been saved.)
 ```
 
-那么，我们就可以使用crontab -e的命令来启用自动任务，命令行：
+接下来使用 `crontab -e` 添加定时任务:
 
-```
+```bash
 sudo crontab -e
 ```
 
-然后会打开打开定时任务配置文件，我们可以按i进入编辑模式，然后输入：
+进入编辑模式后，加入以下内容(每天凌晨 2 点 30 分执行一次续签，日志写入 `/var/log/le-renew.log`):
 
+```cron
+30 2 * * * /usr/bin/certbot renew >> /var/log/le-renew.log
 ```
-30 2 * * * /usr/bin/certbot renew  >> /var/log/le-renew.log
-```
 
-上面的执行时间为：每天凌晨2点30分执行renew任务。
+保存退出后，可在命令行手动执行一次 `/usr/bin/certbot renew >> /var/log/le-renew.log` 验证是否正常。若一切 OK，则自动续签配置完成。
 
-现在可以在命令行执行 `/usr/bin/certbot renew >> /var/log/le-renew.log` 看看是否执行正常，如果一切OK，那么配置就成功了！
+> 补充：通过官方推荐的 `snap` 或包管理器安装的 Certbot，通常会自动注册 `systemd` 定时器(`certbot.timer`),无需再手动添加 cron 任务。可通过 `systemctl list-timers | grep certbot` 查看是否已存在。
+
+## 参考
+
+- [Certbot 官方文档](https://certbot.eff.org/)
+- [Let's Encrypt 官方文档](https://letsencrypt.org/docs/)
+- [acme.sh 项目仓库](https://github.com/acmesh-official/acme.sh)
+- [使用 Nginx 结合 CertBot 配置 HTTPS 协议](https://developer.aliyun.com/article/689901)
