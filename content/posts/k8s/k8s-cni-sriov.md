@@ -2,18 +2,16 @@
 title = "K8s 网络插件 SRIOV-CNI"
 date = "2025-01-12"
 lastmod = "2025-01-12"
-subtitle = "K8s 网络插件 SRIOV-CNI"
-description = "K8s 网络插件 SRIOV-CNI"
+subtitle = "基于 SR-IOV 网卡虚拟化的 Underlay 高性能网络方案"
+description = "SRIOV-CNI 利用 SR-IOV 网卡虚拟化技术为 Kubernetes 提供 Underlay 网络，将 VF 直通到 Pod，获得接近本机的 I/O 性能。本文梳理其原理、sriov-network-operator 与 device-plugin 的协同、以及 VF 配置与安装流程。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["k8s"]
-tags = ["k8s"]
-keywords = []
+tags = ["k8s", "sriov", "cni", "underlay", "网络", "multus"]
+keywords = ["sriov-cni", "sriov", "cni", "underlay", "multus", "kubernetes"]
 toc = true
 draft = false
 +++
-
-# K8s 网络插件 SRIOV-CNI
 
 SRIOV-CNI最早由腾讯互娱计算资源团队开发， 后被 CNI 社区接纳，并被Intel关注和[Fork](https://github.com/Intel-Corp/sriov-cni)。
 
@@ -55,7 +53,7 @@ sriov-cni通常以附加网络形式使用，需要使用multus这类CNI，与fl
 
 通过 ip link show 获取所有网卡：
 
-```
+```bash
 root@172-17-8-120:~# ip link show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -81,7 +79,7 @@ root@172-17-8-120:~# ip link show
 
 过滤常见的虚拟网卡（如 docker0、cali*、vlan 子接口等），以 enp4s0f0np0 为例，确认其是否支持 SR-IOV：
 
-```
+```bash
 root@172-17-8-120:~# ethtool -i enp4s0f0np0
 driver: mlx5_core    # 网卡驱动
 version: 5.15.0-52-generic
@@ -97,14 +95,14 @@ supports-priv-flags: yes
 
 通过 bus-info 查询其 PCI 设备详细信息：
 
-```
+```bash
 root@172-17-8-120:~# lspci -s 0000:04:00.0 -v | grep SR-IOV
     Capabilities: [180] Single Root I/O Virtualization (SR-IOV)
 ```
 
 如果输出有上面此行，说明此网卡支持 SR-IOV。获取此网卡的 vendor 和 device：
 
-```
+```bash
 root@172-17-8-120:~# lspci -s 0000:04:00.0 -n
 04:00.0 0200: 15b3:1017
 ```
@@ -116,17 +114,17 @@ root@172-17-8-120:~# lspci -s 0000:04:00.0 -n
 
 > 可通过 https://devicehunt.com/all-pci-vendors 查询所有 PCI 设备信息。
 
-### 2. 配置 VF（虚拟功能）¶
+### 2. 配置 VF（虚拟功能）
 
 通过下面的方式为支持 SR-IOV 的网卡配置 VF：
 
-```
+```bash
 root@172-17-8-120:~# echo 8 > /sys/class/net/enp4s0f0np0/device/sriov_numvfs
 ```
 
 确认 VF 配置成功：
 
-```
+```bash
 root@172-17-8-120:~# cat /sys/class/net/enp4s0f0np0/device/sriov_numvfs
 8
 root@172-17-8-120:~# ip l show enp4s0f0np0
@@ -144,14 +142,14 @@ root@172-17-8-120:~# ip l show enp4s0f0np0
 
 输出上图内容，表示配置成功。
 
-### 3. 安装 SR-IOV CNI¶
+### 3. 安装 SR-IOV CNI
 
-通过安装 Multus-underlay 来安装 SR-IOV CNI，具体安装流程参考[安装](https://docs.daocloud.io/network/modules/multus-underlay/install/)。 注意, 安装时需正确配置 sriov-device-plugin resource 资源，包括 vendor、device 等信息。 否则 SRIOV-Device-Plugin 无法找到正确的 VF。
+通过安装 Multus-underlay 来安装 SR-IOV CNI，具体安装流程参考[安装](https://docs.daocloud.io/network/modules/multus-underlay/install/)。 注意，安装时需正确配置 sriov-device-plugin resource 资源，包括 vendor、device 等信息。 否则 SRIOV-Device-Plugin 无法找到正确的 VF。
 
-### 4. 配置 SRIOV-Device-Plugin¶
+### 4. 配置 SRIOV-Device-Plugin
 安装完 SR-IOV CNI 之后，通过下面的方式查看 SR-IOV CNI 是否发现了主机上的 VF：
 
-```
+```bash
 root@172-17-8-110:~# kubectl describe nodes 172-17-8-110
 ...
 Allocatable:
@@ -168,7 +166,7 @@ Allocatable:
 
 **优点**
 
-- 性能好, 不占用计算资源
+- 性能好，不占用计算资源
 - intel主推，社区活跃
 
 **缺点**

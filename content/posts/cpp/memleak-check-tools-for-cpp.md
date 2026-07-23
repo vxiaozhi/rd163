@@ -2,13 +2,13 @@
 title = "C++内存泄露检测工具"
 date = "2025-03-22"
 lastmod = "2025-03-22"
-subtitle = "C++内存泄露检测工具"
-description = "C++内存泄露检测工具"
+subtitle = "Valgrind、AddressSanitizer/LSan 与 tcmalloc 的对比与选型"
+description = "梳理 C++ 服务器后台开发中常用的内存泄漏检测工具,对比 Valgrind Memcheck、AddressSanitizer/LeakSanitizer 与 tcmalloc 的检测原理、性能开销与适用场景,并给出开发、测试、生产环境的选择策略。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["cpp"]
-tags = ["cpp", "memleak"]
-keywords = []
+categories = ["cpp", "内存管理"]
+tags = ["cpp", "memleak", "Valgrind", "AddressSanitizer", "tcmalloc", "内存泄漏"]
+keywords = ["C++内存泄漏检测", "Valgrind", "AddressSanitizer", "LeakSanitizer", "tcmalloc", "内存泄漏排查"]
 toc = true
 draft = false
 +++
@@ -171,7 +171,7 @@ pprof --pdf ./your_program /tmp/heap_profile.0001.heap > profile.pdf
 
 ### **5. 优缺点总结**
 | 工具                | 优点                                      | 缺点                                      |
-|---------------------|------------------------------------------|------------------------------------------|
+|---------------------|--------------------------|--------------------------|--------------------------|
 | **tcmalloc**         | - 生产环境友好，性能开销极低<br>- 无需重编译代码 | - 仅检测泄漏，不处理其他内存错误<br>- 分析依赖手动快照对比 |
 | **Valgrind Memcheck** | - 功能全面（内存错误+泄漏）<br>- 无需重编译   | - 性能差，不适用于生产环境<br>- 对系统库误报较多       |
 | **LeakSanitizer (LSan)** | - 速度快，适合高频检测<br>- 集成到编译器链    | - 仅检测泄漏<br>- 需重新编译代码               |
@@ -205,5 +205,4 @@ valgrind --tool=memcheck --leak-check=full ./my_program
 # 生产环境：tcmalloc监控
 LD_PRELOAD="/usr/lib/libtcmalloc.so" HEAPPROFILE=/tmp/heap_profile ./my_program
 ```
-
 

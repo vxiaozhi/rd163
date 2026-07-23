@@ -2,13 +2,13 @@
 title = "怎么使用AI大模型画图"
 date = "2025-01-23"
 lastmod = "2025-01-23"
-subtitle = "怎么使用AI大模型画图"
-description = "怎么使用AI大模型画图"
+subtitle = "从 Replicate 模型选择到 Prompt 工程的实战指南"
+description = "介绍如何使用 AI 大模型生成图片，涵盖 replicate 平台上的 Flux、SDXL 等模型选择、Prompt 生成技巧，以及个人头像和单词助记图片的实践案例。"
 author = "小智晖"
 authors = ["小智晖"]
 categories = ["aigc"]
-tags = ["aigc"]
-keywords = []
+tags = ["aigc", "AI画图", "图像生成", "Flux", "Prompt", "replicate"]
+keywords = ["AI画图", "AI大模型绘图", "Flux", "replicate", "Prompt工程", "ComfyUI"]
 toc = true
 draft = false
 +++
@@ -19,7 +19,7 @@ draft = false
 
 -  [replicate](https://replicate.com/explore)
 
-例如：图像生成（Generate images）模型，用户使用次数最多的是 字节跳动的这个 sdxl 模型, 但经过实际验证，flux-schnell的效果要更好：
+例如：图像生成（Generate images）模型，用户使用次数最多的是 字节跳动的这个 sdxl 模型，但经过实际验证，flux-schnell的效果要更好：
 
 - [bytedance/sdxl-lightning-4step](https://replicate.com/bytedance/sdxl-lightning-4step)
 - [black-forest-labs/flux-schnell](https://replicate.com/black-forest-labs/flux-schnell)
@@ -67,7 +67,7 @@ Prompt 怎么写呢，这里提供一些方法：
 
 以生成博客个人图像为例，这里记录其生成过程：
 
-先用 deepseek 深度思考(R1) 生成 Prompt。
+先用 deepseek 深度思考（R1） 生成 Prompt。
 
 生成prompt的提示词如下：
 
@@ -125,7 +125,7 @@ regret	 v. 懊悔；抱歉 n. 懊悔
 """
 
 这个prompt必须仅使用视觉线索来生成图像，因此请专注于独特的、易于与单词含义相关联的事物。
-你可以忽略不太重要或难以想象的定义，并添加一些单字特征描述场景和图片风格的视觉外观。保持简洁准确的同时坚持完整的句子。解释你的答案并只生成一个prompt。以以下JSON格式提供你的回答(使用单引号在JSON值中，explanation字段的值用中文，prompt字段的值用英文):
+你可以忽略不太重要或难以想象的定义，并添加一些单字特征描述场景和图片风格的视觉外观。保持简洁准确的同时坚持完整的句子。解释你的答案并只生成一个prompt。以以下JSON格式提供你的回答（使用单引号在JSON值中，explanation字段的值用中文，prompt字段的值用英文）:
 """json
 {
     "explanation": "explain why proposed prompt is suitable for remembering the word 'regret'",
@@ -137,7 +137,7 @@ regret	 v. 懊悔；抱歉 n. 懊悔
 
 使用 DeepSeek-R1生成的Prompt如下：
 
-```
+```json
 {
     "explanation": "黄昏象征错过的时光，破碎相框暗示无法挽回的过去，沙漏中的'Sorry'沙字直接关联懊悔的情感，柔和的暗色调强化忧郁氛围。阴影中模糊的人形轮廓避免了具体人物特征，使观者能代入自身经历。",
     "prompt": "A dimly lit room at dusk with a shattered photo frame on wooden floor, golden sand from an hourglass forming the word 'Sorry', soft shadows of a person with lowered head cast on peach-toned walls, in muted watercolor style with blurred edges."
@@ -154,7 +154,3 @@ flux-schnell 效果如下：
 
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 - [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
-
-
-
-

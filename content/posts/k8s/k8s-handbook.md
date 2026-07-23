@@ -2,18 +2,16 @@
 title = "Kubernetes 中文指南"
 date = "2025-01-12"
 lastmod = "2025-01-12"
-subtitle = "Kubernetes 中文指南"
-description = "Kubernetes 中文指南"
+subtitle = "从架构、网络、负载到服务网格的实践手册"
+description = "系统梳理 Kubernetes 的架构、核心组件、网络方案、控制器与服务模型，并延伸到 Ingress 与 Istio 服务网格。适合作为 k8s 入门与速查的中文参考。"
 author = "小智晖"
 authors = ["小智晖"]
-categories = ["k8s"]
-tags = ["k8s"]
-keywords = []
+categories = ["k8s", "云原生"]
+tags = ["k8s", "kubernetes", "云原生", "service-mesh", "istio", "ingress"]
+keywords = ["Kubernetes", "k8s", "云原生", "服务网格", "Istio", "Ingress"]
 toc = true
 draft = false
 +++
-
-# Kubernetes 中文指南
 
 ## 术语解释
 
@@ -194,7 +192,6 @@ Ingress 是从Kubernetes集群外部访问集群内部服务的入口。
 - Proxy per Node
 - Sidecar 代理 / Fabric 模型
 - Sidecar 代理 / 控制平面
-- 
 
 ### 实现了服务网格的软件由哪些
 
